@@ -3,14 +3,8 @@
   "builds": [
     {
       "src": "./server.js",
-      "use": "@vercel/node",
-      "config": {
-        "functions": {
-          "controllers/*.js": { "maxDuration": 60 },
-          "middleware/**/*.js": { "maxDuration": 60 }
-        }
+      "use": "@vercel/node"
       }
-    }
   ],
   "routes": [
     { "src": "/(.*)", "dest": "/index.html" }
