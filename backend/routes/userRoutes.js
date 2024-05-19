@@ -21,7 +21,7 @@ router.post("/", registerValidator, createUser);
 // login  a  User
 // Delete User
 router.delete("/:id", deleteUser);
-
+//comment
 // Update User
 router.patch("/:id", updateUser);
 module.exports = router;
