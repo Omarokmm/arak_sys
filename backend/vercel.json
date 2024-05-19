@@ -1,15 +1,26 @@
- {
-  "version": 2,
-  "builds": [
-    {
-      "src": "./server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "destination": "/"
-    }
-  ]
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "./server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "rewrites": [
+        { "source": "/(.*)", "destination": "./server.js" }
+    ],
+    "headers": [
+        {
+          "source": "/(.*)",
+          "headers": [
+            { "key": "Access-Control-Allow-Origin", "value": "*" }
+          ]
+        },
+        {
+          "source": "/https://arak-sys-skyd-dhj0niije-omarokmms-projects.vercel.app/(.*)",
+          "headers": [
+            { "key": "Access-Control-Allow-Origin", "value": "*" }
+          ]
+        }  
+    ]
 }
