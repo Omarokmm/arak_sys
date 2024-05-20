@@ -15,12 +15,6 @@
           "headers": [
             { "key": "Access-Control-Allow-Origin", "value": "*" }
           ]
-        },
-        {
-          "source": "/https://arak-sys-skyd-dhj0niije-omarokmms-projects.vercel.app/(.*)",
-          "headers": [
-            { "key": "Access-Control-Allow-Origin", "value": "*" }
-          ]
-        }  
+        }
     ]
 }
