@@ -12,6 +12,9 @@ const doctorSchema = new Schema(
       type: String,
       required: true,
     },
+    clinicName: {
+      type: String,
+    },
     email: {
       type: String,
     },
@@ -33,7 +36,7 @@ const doctorSchema = new Schema(
       city: { type: String },
       state: { type: String },
       zipCode: { type: String },
-      country: { type: String},
+      country: { type: String },
     },
     specialization: {
       type: String,

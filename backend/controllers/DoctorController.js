@@ -37,6 +37,7 @@ const createDoctor = async (req, res) => {
   const {
     firstName,
     lastName,
+    clinicName,
     email,
     phone,
     gender,
@@ -71,6 +72,7 @@ const createDoctor = async (req, res) => {
     const doctor = await Doctor.create({
       firstName,
       lastName,
+      clinicName,
       email,
       phone,
       gender,

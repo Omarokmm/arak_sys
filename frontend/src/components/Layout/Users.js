@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { showToastMessage } from "../../helper/toaster";
 import { format } from "date-fns";
+import * as _global from "../../config/global";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [buffUsers, setBuffUsers] = useState([]);
@@ -39,7 +40,7 @@ const Users = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/api/users`)
+      .get(`${_global.BASE_URL}users`)
       .then((res) => {
         const result = res.data;
         setUsers(result);
@@ -50,7 +51,7 @@ const Users = () => {
         console.error("Error fetching users:", error);
       });
     axios
-      .get(`http://localhost:4000/api/departments`)
+      .get(`${_global.BASE_URL}departments`)
       .then((res) => {
         const result = res.data;
         setDepartments(result);
@@ -62,7 +63,7 @@ const Users = () => {
   }, []);
   const deleteUser = (id) => {
     axios
-      .delete(`http://localhost:4000/api/users/${id}`)
+      .delete(`${_global.BASE_URL}users/${id}`)
       .then((res) => {
         const result = res.data;
         const filteredUsers = users.filter((user) => user._id !== result._id);
@@ -100,7 +101,7 @@ const Users = () => {
       active: true,
     };
     console.log(userModel);
-    const response = await fetch("http://localhost:4000/api/users", {
+    const response = await fetch(`${_global.BASE_URL}users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +146,7 @@ const Users = () => {
     console.log(buffUser);
     console.log(noteUser);
     const response = await fetch(
-      "http://localhost:4000/api/users/" + buffUser._id,
+     `${_global.BASE_URL}users/` + buffUser._id,
       {
         method: "PATCH",
         headers: {
@@ -166,18 +167,6 @@ const Users = () => {
     //   setEmptyFields(json.emptyFields);
     // }
   };
-  // const searchByName = (searchText)=>{
-  //   setSearchText(searchText);
-  //   console.log(searchText);
-  //   const filteredUsers = users.filter((item) =>
-  //     item.firstName.includes(searchText)
-  //   );
-  //   if (searchText !== "") {
-  //     setUsers(filteredUsers);
-  //   } else {
-  //     setUsers(buffUsers);
-  //   }
-  // }
   const searchByName = (searchText) => {
     setSearchText(searchText);
     console.log(searchText);
@@ -224,6 +213,7 @@ const Users = () => {
                 <thead>
                   <tr className="table-secondary">
                     <th scope="col">Name</th>
+                    <th scope="col">Email</th>
                     <th scope="col">Phone</th>
                     <th scope="col">Role</th>
                     <th scope="col">Actions</th>
@@ -246,6 +236,9 @@ const Users = () => {
                     >
                       <td>
                         {item.firstName} {item.lastName}
+                      </td>
+                      <td>
+                        {item.email} 
                       </td>
                       <td>{item.phone}</td>
                       <td>

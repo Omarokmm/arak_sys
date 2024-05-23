@@ -1,4 +1,5 @@
 const User = require("../models/UserModel");
+const Department = require("../models/DepartmentModel");
 const responsesStatus = require("../enum/responsesStatus");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt"); 
@@ -66,13 +67,25 @@ const loginUser = async (req, res) => {
          msg: "Email & Password is incorrect",
        });
      }
-     const accessToken = generateAccessToken({user:userData})
+    const departmentIds = userData.departments;
+    const departments = await Department.find({ _id: { $in: departmentIds } });
+    //    const userWithDepartments = {
+    //   ...userData,
+    //   departments: departments.map(dept => dept.name),
+    // };
+    const accessToken = generateAccessToken({user:userData})
        return res.status(responsesStatus.OK).json({
          success: true,
          msg: "Login Successfully",
          accessToken: accessToken,
          tokenType: "Bearer",
-         data:userData
+         data:userData,
+         departments :departments.map(dept => {
+          return {
+           name: dept.name,
+           id: dept._id,
+          }
+         })
        });
   } catch (error) { 
     return res
@@ -101,43 +114,6 @@ const createUser = async (req, res) => {
     active,
     roles,
   } = req.body;
-//   const emptyFields = [];
-//   if (!firstName) {
-//     emptyFields.push("firstName");
-//   }
-//   if (!lastName) {
-//     emptyFields.push("lastName");
-//   }
-//   if (!email) {
-//     emptyFields.push("email");
-//   }
-//     if (!phone) {
-//       emptyFields.push("phone");
-//     }
-//   if (!street || !city || !country) {
-//     emptyFields.push("address");
-//   }
-//   if (!password) {
-//     emptyFields.push("password");
-//   }
-//   if (!confirmPassword) {
-//     emptyFields.push("confirmPassword");
-//   }
-//     if (!gender) {
-//       emptyFields.push("gender");
-//     }
-//  if (!dateOfBirth) {
-//    emptyFields.push("dateOfBirth");
-//  }
-//   if (!departments) {
-//     emptyFields.push("Departments");
-//   }
-//   if (emptyFields.length > 0) {
-//     return res.status(responsesStatus.BadRequest).json({
-//       error: `Please fill in the following fields: ${emptyFields.join(", ")}`,
-//       emptyFields,
-//     });
-//   }
   // add User to db
   try {
       const errors = validationResult(req);
@@ -235,6 +211,47 @@ const updateUser = async (req, res) => {
     res.status(responsesStatus.BadRequest).json({ error: error.message });
   }
 };
+
+// change password
+// POST /api/users/change-password
+const changePassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+  try {
+    // Validate request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(responsesStatus.BadRequest).json({
+        success: false,
+        msg: 'Error',
+        errors: errors.array(),
+      });
+    }
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(responsesStatus.BadRequest).json({
+        success: false,
+        msg: 'User not found',
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    user.confirmPassword = hashedPassword;
+    await user.save();
+
+    res.status(responsesStatus.OK).json({
+      success: true,
+      msg: 'Password updated successfully',
+    });
+  } catch (error) {
+    return res.status(responsesStatus.BadRequest).json({ error: error.message });
+  }
+};
 module.exports = {
   createUser,
   getUsers,
@@ -242,4 +259,5 @@ module.exports = {
   getUserById,
   deleteUser,
   updateUser,
+  changePassword
 };

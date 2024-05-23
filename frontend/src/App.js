@@ -9,6 +9,10 @@ import Departments from "./components/Layout/Departments";
 import Users from "./components/Layout/Users";
 import Doctors from "./components/Layout/Doctors";
 import RequireAuth from "./actions/RequiredAuth";
+import Cases from "./components/Layout/Cases/Cases";
+import ViewCase from "./components/Layout/Cases/ViewCase";
+import AddNewCase from "./components/Layout/Cases/AddNewCase";
+import CaseProcess from "./components/Layout/Cases/CaseProcess/CaseProcess";
 function App() {
   return (
     <div className="App">
@@ -22,6 +26,10 @@ function App() {
                 <Route path="users" element={<Users />} />
                 <Route path="departments" element={<Departments />} />
                 <Route path="doctors" element={<Doctors />} />
+                <Route path="cases" element={<Cases />} />
+                <Route path="view-case" element={<ViewCase />} />
+                <Route path="add-case" element={<AddNewCase />} />
+                <Route path="process-case" element={<CaseProcess />} />
               </Route>
             </Route>
           </Routes>

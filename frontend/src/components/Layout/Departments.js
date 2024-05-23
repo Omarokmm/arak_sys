@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { showToastMessage } from "../../helper/toaster";
 // import { Roles } from "../../config/global";
-
+import * as _global from "../../config/global";
 const Departments = () => {
   const [departments, setDepartments] = useState([]);
   const [emptyFields, setEmptyFields] = useState([]);
@@ -20,7 +20,7 @@ const Departments = () => {
  };
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/api/departments`)
+      .get(`${_global.BASE_URL}departments`)
       .then((res) => {
         const result = res.data;
         setDepartments(result);
@@ -32,7 +32,7 @@ const Departments = () => {
   }, []);
   const deleteDepartment = (id) => {
     axios
-      .delete(`http://localhost:4000/api/departments/${id}`)
+      .delete(`${_global.BASE_URL}departments/${id}`)
       .then((res) => {
         const result = res.data;
         const filteredDepartment = departments.filter(
@@ -55,7 +55,7 @@ const Departments = () => {
       sections: [],
     };
     console.log(departmentModel);
-    const response = await fetch("http://localhost:4000/api/departments", {
+      const response = await fetch(`${_global.BASE_URL}departments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,12 +81,12 @@ const Departments = () => {
     setBuffDepartment(department)
  axios
    .get(
-     `http://localhost:4000/api/departments/users-in-departments/${department._id}`
+     `${_global.BASE_URL}departments/users-in-departments/${department._id}`
    )
    .then((res) => {
      const result = res.data;
      setUsers(result);
-     console.log(result);
+     console.log(result); 
    })
    .catch((error) => {
      console.error("Error fetching departments:", error);

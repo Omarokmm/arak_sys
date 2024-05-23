@@ -4,6 +4,7 @@ const workoutsRoutes = require("./routes/workouts");
 const usersRoutes = require("./routes/userRoutes");
 const departmentsRoutes = require("./routes/departmentRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
+const casesRoutes = require("./routes/casesRoutes");
 const mongoose = require("mongoose");
 const { loginValidator } = require("./helper/validator");
 const {
@@ -33,6 +34,7 @@ app.use("/api/workouts", workoutsRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/departments", departmentsRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use("/api/cases", casesRoutes);
 app.post("/login", loginValidator, loginUser);
 mongoose
   .connect(process.env.MONGO_URL)

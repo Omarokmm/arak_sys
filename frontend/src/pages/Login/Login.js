@@ -28,8 +28,8 @@ const Login = () => {
       console.log("login successfully");
       navigate('/layout');
     const { password, confirmPassword, ...userWithoutPasswords } = json.data;
-
       localStorage.setItem("user", JSON.stringify(userWithoutPasswords));
+      localStorage.setItem("departments", JSON.stringify(json.departments));
       showToastMessage("logged successfully", "success");
       console.log(json);
     }

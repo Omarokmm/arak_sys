@@ -3,15 +3,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { showToastMessage } from "../../helper/toaster";
 import { format } from "date-fns";
+import * as _global from "../../config/global";
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [buffDoctor, setBuffDoctor] = useState([]);
+  const [buffDoctors, setBuffDoctors] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [department, setDepartment] = useState("");
   const [joiningDate, setJoiningDate] = useState(null);
   const [licenseExpireDate, setLicenseExpireDate] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
   const [firstName, setFirstName] = useState("");
+  const [clinicName, setClinicName] = useState("");
   const [lastName, setLastName] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [registrationNumber, setRegistrationNumber] = useState("");
@@ -20,6 +23,7 @@ const Doctors = () => {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [searchText, setSearchText] = useState([]);
   const [role, setRole] = useState("");
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
@@ -35,10 +39,11 @@ const Doctors = () => {
   };
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/api/doctors`)
+      .get(`${_global.BASE_URL}doctors`)
       .then((res) => {
         const result = res.data;
         setDoctors(result);
+        setBuffDoctors(result);
         console.log(result);
       })
       .catch((error) => {
@@ -47,7 +52,7 @@ const Doctors = () => {
   }, []);
   const deleteDoctor = (id) => {
     axios
-      .delete(`http://localhost:4000/api/doctors/${id}`)
+      .delete(`${_global.BASE_URL}doctors/${id}`)
       .then((res) => {
         const result = res.data;
         const filteredDoctors = doctors.filter(
@@ -77,6 +82,7 @@ const Doctors = () => {
         zipCode: "",
         country: country,
       },
+      clinicName,
       specialization,
       registrationNumber,
       notes: [],
@@ -84,7 +90,7 @@ const Doctors = () => {
       active: true,
     };
     console.log(doctorModel);
-    const response = await fetch("http://localhost:4000/api/doctors", {
+    const response = await fetch(`${_global.BASE_URL}doctors`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,16 +127,13 @@ const Doctors = () => {
     });
     console.log(buffDoctor);
     console.log(noteDoctor);
-    const response = await fetch(
-      "http://localhost:4000/api/doctors/" + buffDoctor._id,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(buffDoctor),
-      }
-    );
+    const response = await fetch(`${_global.BASE_URL}doctors/${buffDoctor._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(buffDoctor),
+    });
     const json = await response.json();
     if (response.ok) {
       setNoteDoctor("");
@@ -143,12 +146,49 @@ const Doctors = () => {
     //   setEmptyFields(json.emptyFields);
     // }
   };
+  const onUpdateDoctor = async () => {
+  const response = await fetch(`${_global.BASE_URL}doctors/${buffDoctor._id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(buffDoctor),
+  });
+  const json = await response.json();
+  if (response.ok) {
+    setNoteDoctor("");
+    showToastMessage("Updated note to successfully", "success");
+  }
+  // if (!response.ok) {
+  //   console.log(json);
+  //   const newUsers = [...users, JSON.parse(JSON.stringify(json.data))];
+  //   setUsers(newUsers);
+  //   setEmptyFields(json.emptyFields);
+  // }
+};
+    const searchByName = (searchText) => {
+      setSearchText(searchText);
+      console.log(searchText);
+
+      if (searchText !== "") {
+        const filteredDoctor = buffDoctors.filter(
+          (item) =>
+            item.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+            item.lastName.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setDoctors(filteredDoctor);
+      } else {
+        setDoctors(buffDoctors);
+      }
+    };
   return (
     <>
       <div className="content">
         <div className="card">
           <h5 class="card-title">
-            <span>Users</span>
+            <span>
+              Doctors <small>({doctors.length})</small>
+            </span>
             <span className="add-user-icon">
               <a data-bs-toggle="modal" data-bs-target="#exampleModal">
                 {" "}
@@ -157,24 +197,28 @@ const Doctors = () => {
             </span>
           </h5>
           <div className="card-body">
+            <div className="form-group">
+              <input
+                type="text"
+                name="searchText"
+                className="form-control"
+                placeholder="Search by name"
+                value={searchText}
+                onChange={(e) => searchByName(e.target.value)}
+              />
+            </div>
             {doctors.length > 0 && (
               <table className="table text-center table-bordered">
                 <thead>
                   <tr className="table-secondary">
                     <th scope="col">Name</th>
-                    <th scope="col">Num of notes</th>
+                    <th scope="col">Clinic Name</th>
+                    <th scope="col">Country</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {doctors.map((item) => (
-                    // <tr key={item._id}>
-                    // <tr
-                    //   key={item._id}
-                    //   className={` ${
-                    //     item.notes.length > 0 ? "table-danger" : "table-default"
-                    //   }`}
-                    // >
                     <tr
                       key={item._id}
                       className={`${
@@ -184,7 +228,8 @@ const Doctors = () => {
                       <td>
                         {item.firstName} {item.lastName}
                       </td>
-                      <td>{item.notes.length}</td>
+                      <td>{item.clinicName}</td>
+                      <td>{item?.address?.country}</td>
                       <td>
                         <div className="actions-btns">
                           <span
@@ -194,9 +239,16 @@ const Doctors = () => {
                           >
                             <i class="fa-solid fa-circle-plus"></i>
                           </span>
-                          <span onClick={(e) => deleteDoctor(item._id)}>
-                            <i className="fa-solid fa-trash-can"></i>
+                            <span
+                            data-bs-toggle="modal"
+                            data-bs-target="#updateDoctorModal"
+                            onClick={() => {setBuffDoctor(item) }}
+                          >
+                         <i class="fa-solid fa-pen-to-square"></i>
                           </span>
+                          {/* <span onClick={(e) => deleteDoctor(item._id)}>
+                              <i className="fa-solid fa-trash-can"></i>
+                            </span> */}
                         </div>
                       </td>
                     </tr>
@@ -204,8 +256,8 @@ const Doctors = () => {
                 </tbody>
               </table>
             )}
-            {doctors.length <= 0 && (
-              <div className="no-content">No Doctors Added yet!</div>
+            {(doctors.length <= 0 || searchByName === "") && (
+              <div className="no-content">Doctor Not Found</div>
             )}
           </div>
         </div>
@@ -268,6 +320,24 @@ const Doctors = () => {
                         }}
                         value={lastName}
                         placeholder="Enter Last Name "
+                      />
+                    </div>{" "}
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label htmlFor="clinicName"> Clinic Name </label>{" "}
+                      <input
+                        type="text"
+                        id="clinicName"
+                        name="clinicName"
+                        className={`form-control ${
+                          emptyFields.includes("clinicName") ? "error" : ""
+                        }`}
+                        onChange={(e) => {
+                          setClinicName(e.target.value);
+                        }}
+                        value={clinicName}
+                        placeholder="Enter Clinic Name "
                       />
                     </div>{" "}
                   </div>
@@ -404,6 +474,113 @@ const Doctors = () => {
         </div>
       </div>
 
+      {/* Update Doctor Modal */}
+      <div
+        class="modal fade"
+        id="updateDoctorModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog ">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Update Doctor
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="row">
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label htmlFor="firstName"> First Name </label>{" "}
+                      <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        className="form-control"
+                        disabled={true}
+                        value={buffDoctor.firstName}
+                        placeholder="Enter First Name"
+                      />
+                    </div>{" "}
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label htmlFor="lastName"> Last Name </label>{" "}
+                      <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        className="form-control"
+                        disabled={true}
+                         value={buffDoctor.lastName}
+                        placeholder="Enter Last Name "
+                      />
+                    </div>{" "}
+                  </div>
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label htmlFor="clinicName"> Clinic Name </label>{" "}
+                      <input
+                        type="text"
+                        id="clinicName"
+                        name="clinicName"
+                        className="form-control"
+                        disabled={true}
+                        value={buffDoctor.clinicName}
+                        placeholder="Enter Clinic Name "
+                      />
+                    </div>{" "}
+                  </div>
+                     <div className="col-lg-12">
+                    <div className="form-group">
+                      <label htmlFor="country"> Country </label>{" "}
+                      <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        className="form-control"
+                        value={buffDoctor?.address?.country}
+                        onChange={(e)=>{
+                                const updatedDoctor = { ...buffDoctor };
+                                updatedDoctor.address.country = e.target.value; // Replace with your desired country
+                                setBuffDoctor(updatedDoctor);
+                        }}
+                        placeholder="Enter Country "
+                      />
+                    </div>{" "}
+                  </div>
+                </div>
+              </form>{" "}
+            </div>
+            <div class="modal-footer ">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={(e) => onUpdateDoctor()}
+                class="btn btn-success"
+                data-bs-dismiss="modal"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Add Note Modal */}
       <div
         class="modal fade"
