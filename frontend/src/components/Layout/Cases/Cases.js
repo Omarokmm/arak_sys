@@ -289,10 +289,12 @@ const Cases = ()=>{
         <h5 class="card-title">
           <span>Cases</span>
           <span className="add-user-icon">
+            {user.roles[0] === _global.allRoles.admin && 
             <span onClick={() => navigate("/layout/add-case")}>
               {" "}
               <i class="fa-solid fa-circle-plus "></i>
             </span>
+            }
           </span>
         </h5>
         <div className="card-body">
@@ -427,17 +429,19 @@ const Cases = ()=>{
                             {/* <span onClick={(e) => deleteCase(item._id)}>
                                 <i className="fa-solid fa-trash-can"></i>
                               </span> */}
-                           { !item.isHold && user.roles[0] === _global.allRoles.admin && <span
-                              data-bs-toggle="modal"
-                              data-bs-target="#caseHoldModal"
-                              onClick={() => {
-                                setIsHoldCase(true);
-                                setBuffCase(item);
-                              }}
-                            >
-                              <i class="fa-regular fa-circle-pause"></i>
-                            </span>
-}
+                            {!item.isHold &&
+                              user.roles[0] === _global.allRoles.admin && (
+                                <span
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#caseHoldModal"
+                                  onClick={() => {
+                                    setIsHoldCase(true);
+                                    setBuffCase(item);
+                                  }}
+                                >
+                                  <i class="fa-regular fa-circle-pause"></i>
+                                </span>
+                              )}
                           </div>
                         </td>
                       </tr>
@@ -573,17 +577,18 @@ const Cases = ()=>{
                               {/* <span onClick={(e) => deleteCase(item._id)}>
                                 <i className="fa-solid fa-trash-can"></i>
                               </span> */}
-                              { user.roles[0] === _global.allRoles.admin &&  <span
-                                data-bs-toggle="modal"
-                                data-bs-target="#caseHoldModal"
-                                onClick={() => {
-                                  setIsHoldCase(false);
-                                  setBuffCase(item);
-                                }}
-                              >
-                               <i class="fa-solid fa-arrow-rotate-left"></i>
-                              </span>
-                              }
+                              {user.roles[0] === _global.allRoles.admin && (
+                                <span
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#caseHoldModal"
+                                  onClick={() => {
+                                    setIsHoldCase(false);
+                                    setBuffCase(item);
+                                  }}
+                                >
+                                  <i class="fa-solid fa-arrow-rotate-left"></i>
+                                </span>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -675,7 +680,11 @@ const Cases = ()=>{
       >
         <div class="modal-dialog ">
           <div class="modal-content">
-            <div class={`modal-header  text-white ${isHoldCase ? "bg-danger" : 'bg-success'}`} >
+            <div
+              class={`modal-header  text-white ${
+                isHoldCase ? "bg-danger" : "bg-success"
+              }`}
+            >
               <h1 class="modal-title fs-5" id="exampleModalLabel">
                 Case Number # {buffCase?.caseNumber}
               </h1>
@@ -690,7 +699,8 @@ const Cases = ()=>{
               <div className="text-center">
                 <h6>
                   Are you sure from{" "}
-                  {isHoldCase ? <span>Hold</span> : <span> UnHold</span>} this case?
+                  {isHoldCase ? <span>Hold</span> : <span> UnHold</span>} this
+                  case?
                 </h6>
               </div>
             </div>
@@ -699,11 +709,15 @@ const Cases = ()=>{
                 Cancel
               </button>
               <button
-                className={isHoldCase ? "btn btn-sm btn-danger" : 'btn btn-sm btn-success'}
+                className={
+                  isHoldCase
+                    ? "btn btn-sm btn-danger"
+                    : "btn btn-sm btn-success"
+                }
                 data-bs-dismiss="modal"
                 onClick={(e) => holdCase(buffCase)}
               >
-                {isHoldCase ? 'Hold':'UnHold'}
+                {isHoldCase ? "Hold" : "UnHold"}
               </button>
             </div>
           </div>
